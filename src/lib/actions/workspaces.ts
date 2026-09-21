@@ -53,6 +53,8 @@ export async function createWorkspace(formData: FormData): Promise<ActionResult>
 
   if (memberError) return { error: memberError.message };
 
+  await supabase.from("settings").insert({ workspace_id: workspaceId, billing: { plan: "free" } });
+
   redirect(`/dashboard/${slug}`);
 }
 

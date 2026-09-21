@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { UpgradeButton } from "@/components/dashboard/upgrade-button";
 import { initials } from "@/lib/utils";
 
 export default async function WorkspaceSettingsPage({
@@ -21,6 +22,15 @@ export default async function WorkspaceSettingsPage({
     .from("workspace_members")
     .select("role, user_id")
     .eq("workspace_id", workspace?.id);
+
+  const { data: settings } = await supabase
+    .from("settings")
+    .select("billing")
+    .eq("workspace_id", workspace?.id)
+    .maybeSingle();
+
+  const plan = (settings?.billing as { plan?: string } | undefined)?.plan ?? "free";
+  const stripeConfigured = Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-6 py-10 lg:px-10">
@@ -66,13 +76,21 @@ export default async function WorkspaceSettingsPage({
           <CardTitle>Facturation</CardTitle>
           <CardDescription>Gérée via Stripe.</CardDescription>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
-            <p>La facturation Stripe est configurée. Un plan gratuit est actif par défaut.</p>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <p>
+            Plan actuel : <Badge tone={plan === "pro" ? "accent" : "neutral"}>{plan === "pro" ? "Pro" : "Gratuit"}</Badge>
+          </p>
+          {stripeConfigured ? (
+            plan !== "pro" && workspace ? (
+              <UpgradeButton workspaceId={workspace.id} />
+            ) : (
+              <p>Abonnement actif.</p>
+            )
           ) : (
             <p>
               Stripe n'est pas encore configuré. Renseignez <code className="rounded bg-surface-raised px-1">STRIPE_SECRET_KEY</code>,{" "}
-              <code className="rounded bg-surface-raised px-1">STRIPE_WEBHOOK_SECRET</code> et{" "}
+              <code className="rounded bg-surface-raised px-1">STRIPE_WEBHOOK_SECRET</code>,{" "}
+              <code className="rounded bg-surface-raised px-1">STRIPE_PRICE_ID_PRO</code> et{" "}
               <code className="rounded bg-surface-raised px-1">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code> pour activer les paiements.
             </p>
           )}

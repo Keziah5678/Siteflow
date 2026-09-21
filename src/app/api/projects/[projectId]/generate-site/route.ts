@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { orchestrator } from "@/lib/ai/orchestrator";
 import { isAIConfigured, AIUnavailableError } from "@/lib/ai/client";
 import { enrichImages } from "@/lib/ai/enrich-images";
+import { slugify } from "@/lib/utils";
 import type { BusinessProfile } from "@/lib/types";
 
 export async function POST(
@@ -67,9 +68,23 @@ export async function POST(
       .eq("project_id", projectId);
     if (designError) throw new Error(designError.message);
 
+    let publicSlug = website.public_slug;
+    if (!publicSlug) {
+      const base = slugify(profile.company) || "site";
+      for (let attempt = 0; attempt < 6 && !publicSlug; attempt++) {
+        const candidate = attempt === 0 ? base : `${base}-${attempt + 1}`;
+        const { error: slugError } = await supabase
+          .from("websites")
+          .update({ public_slug: candidate })
+          .eq("id", website.id);
+        if (!slugError) publicSlug = candidate;
+        else if (slugError.code !== "23505") throw new Error(slugError.message);
+      }
+    }
+
     await supabase
       .from("websites")
-      .update({ global_seo: plan.global_seo })
+      .update({ global_seo: plan.global_seo, status: "published" })
       .eq("id", website.id);
 
     // Replace any existing pages (regeneration case) — cascades to sections.

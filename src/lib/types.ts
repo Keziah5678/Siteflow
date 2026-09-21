@@ -105,6 +105,7 @@ export interface Website {
   project_id: string;
   status: WebsiteStatus;
   domain: string | null;
+  public_slug: string | null;
   global_seo: {
     site_title?: string;
     site_description?: string;
