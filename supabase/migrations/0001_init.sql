@@ -51,16 +51,6 @@ as $$
   );
 $$;
 
-create or replace function public.workspace_id_for_project(target_project_id uuid)
-returns uuid
-language sql
-security definer
-set search_path = public
-stable
-as $$
-  select workspace_id from public.projects where id = target_project_id;
-$$;
-
 -- ----------------------------------------------------------------------------
 -- projects
 -- ----------------------------------------------------------------------------
@@ -75,6 +65,19 @@ create table if not exists public.projects (
   updated_at timestamptz not null default now(),
   unique (workspace_id, slug)
 );
+
+-- Helper: the workspace a given project belongs to (defined here, once
+-- public.projects exists — Postgres resolves LANGUAGE SQL function bodies
+-- against the catalog at CREATE time, unlike plpgsql).
+create or replace function public.workspace_id_for_project(target_project_id uuid)
+returns uuid
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select workspace_id from public.projects where id = target_project_id;
+$$;
 
 -- ----------------------------------------------------------------------------
 -- business_profiles
