@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf9f6;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --foreground: #14150f;
+  --muted: #6b6a63;
+  --muted-foreground: #85837a;
+  --border: #e6e3da;
+  --border-strong: #d5d1c4;
+
+  --primary: #14261f;
+  --primary-foreground: #f7f5ee;
+  --accent: #b5732c;
+  --accent-foreground: #ffffff;
+  --success: #2f6b4f;
+  --danger: #b0392f;
+  --warning: #b5732c;
+  --ring: #14261f;
+
+  --radius-sm: 0.4rem;
+  --radius-md: 0.65rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-color: 20 15 5;
+  --shadow-sm: 0 1px 2px rgba(var(--shadow-color) / 0.06);
+  --shadow-md: 0 4px 16px -4px rgba(var(--shadow-color) / 0.12);
+  --shadow-lg: 0 20px 40px -12px rgba(var(--shadow-color) / 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d0e0b;
+    --surface: #16170f;
+    --surface-raised: #1c1d14;
+    --foreground: #f2f0e6;
+    --muted: #a6a397;
+    --muted-foreground: #8b887c;
+    --border: #2a2a20;
+    --border-strong: #38382a;
+
+    --primary: #e9e4d4;
+    --primary-foreground: #14150f;
+    --accent: #d99148;
+    --accent-foreground: #14150f;
+    --ring: #e9e4d4;
+
+    --shadow-color: 0 0 0;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-ring: var(--ring);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* Respect the user's motion preference globally. Components should also
+   read this at runtime (see components/motion/MotionProvider.tsx) but this
+   CSS-level fallback guarantees compliance even for non-JS animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
