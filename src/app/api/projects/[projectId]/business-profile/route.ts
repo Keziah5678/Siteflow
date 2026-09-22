@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isProjectMember } from "@/lib/supabase/authorize";
 import { businessProfileInputSchema, computeCompleteness } from "@/lib/ai/schemas";
 
 export async function GET(
@@ -8,7 +9,16 @@ export async function GET(
 ) {
   const { projectId } = await params;
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectMember(user.id, projectId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
+
+  const db = createServiceRoleClient();
+  const { data, error } = await db
     .from("business_profiles")
     .select("*")
     .eq("project_id", projectId)
@@ -30,6 +40,9 @@ export async function PATCH(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectMember(user.id, projectId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
 
   const body = await request.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
@@ -39,7 +52,8 @@ export async function PATCH(
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Données invalides." }, { status: 422 });
   }
 
-  const { data: existing, error: fetchError } = await supabase
+  const db = createServiceRoleClient();
+  const { data: existing, error: fetchError } = await db
     .from("business_profiles")
     .select("*")
     .eq("project_id", projectId)
@@ -51,7 +65,7 @@ export async function PATCH(
   const merged = { ...existing, ...parsed.data };
   const completeness = computeCompleteness(merged);
 
-  const { data: updated, error: updateError } = await supabase
+  const { data: updated, error: updateError } = await db
     .from("business_profiles")
     .update({ ...parsed.data, completeness })
     .eq("project_id", projectId)

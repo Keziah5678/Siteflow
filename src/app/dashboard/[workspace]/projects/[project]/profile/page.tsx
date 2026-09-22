@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { ProfileWizard } from "@/components/wizard/profile-wizard";
 import type { BusinessProfile } from "@/lib/types";
 
@@ -9,7 +9,7 @@ export default async function ProfilePage({
   params: Promise<{ workspace: string; project: string }>;
 }) {
   const { workspace: workspaceSlug, project: projectSlug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
 
   const { data: workspace } = await supabase
     .from("workspaces")

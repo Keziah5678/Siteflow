@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isProjectMember } from "@/lib/supabase/authorize";
 import { getWebsiteSnapshot } from "@/lib/site/get-snapshot";
 import type { WebsiteSnapshot } from "@/lib/types";
 
@@ -14,11 +15,16 @@ export async function POST(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectMember(user.id, projectId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
 
-  const { data: website } = await supabase.from("websites").select("id").eq("project_id", projectId).maybeSingle();
+  const db = createServiceRoleClient();
+
+  const { data: website } = await db.from("websites").select("id").eq("project_id", projectId).maybeSingle();
   if (!website) return NextResponse.json({ error: "Site introuvable." }, { status: 404 });
 
-  const { data: version, error: versionError } = await supabase
+  const { data: version, error: versionError } = await db
     .from("site_versions")
     .select("*")
     .eq("id", versionId)
@@ -35,15 +41,15 @@ export async function POST(
     void project_id;
     void created_at;
     void updated_at;
-    await supabase.from("design_systems").update(designFields).eq("project_id", projectId);
+    await db.from("design_systems").update(designFields).eq("project_id", projectId);
   }
 
-  await supabase.from("websites").update({ global_seo: snapshot.website?.global_seo ?? {} }).eq("id", website.id);
+  await db.from("websites").update({ global_seo: snapshot.website?.global_seo ?? {} }).eq("id", website.id);
 
-  await supabase.from("pages").delete().eq("website_id", website.id);
+  await db.from("pages").delete().eq("website_id", website.id);
 
   for (const page of snapshot.pages ?? []) {
-    const { data: insertedPage, error: pageError } = await supabase
+    const { data: insertedPage, error: pageError } = await db
       .from("pages")
       .insert({
         website_id: website.id,
@@ -65,13 +71,13 @@ export async function POST(
       content: s.content,
     }));
     if (sectionRows.length > 0) {
-      const { error: sectionsError } = await supabase.from("sections").insert(sectionRows);
+      const { error: sectionsError } = await db.from("sections").insert(sectionRows);
       if (sectionsError) return NextResponse.json({ error: sectionsError.message }, { status: 400 });
     }
   }
 
-  const restoredSnapshot = await getWebsiteSnapshot(supabase, projectId);
-  await supabase.from("site_versions").insert({
+  const restoredSnapshot = await getWebsiteSnapshot(db, projectId);
+  await db.from("site_versions").insert({
     website_id: website.id,
     label: `Restauration : ${version.label}`,
     snapshot: restoredSnapshot,

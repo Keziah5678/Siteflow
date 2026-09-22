@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UpgradeButton } from "@/components/dashboard/upgrade-button";
@@ -10,7 +10,7 @@ export default async function WorkspaceSettingsPage({
   params: Promise<{ workspace: string }>;
 }) {
   const { workspace: workspaceSlug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
 
   const { data: workspace } = await supabase
     .from("workspaces")

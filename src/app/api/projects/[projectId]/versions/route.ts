@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isProjectMember } from "@/lib/supabase/authorize";
 
 export async function GET(
   _request: Request,
@@ -8,10 +9,19 @@ export async function GET(
   const { projectId } = await params;
   const supabase = await createClient();
 
-  const { data: website } = await supabase.from("websites").select("id").eq("project_id", projectId).maybeSingle();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectMember(user.id, projectId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
+
+  const db = createServiceRoleClient();
+  const { data: website } = await db.from("websites").select("id").eq("project_id", projectId).maybeSingle();
   if (!website) return NextResponse.json({ versions: [] });
 
-  const { data: versions } = await supabase
+  const { data: versions } = await db
     .from("site_versions")
     .select("id, label, created_at, created_by")
     .eq("website_id", website.id)

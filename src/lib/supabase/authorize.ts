@@ -29,3 +29,29 @@ export async function isProjectMember(userId: string, projectId: string): Promis
   if (!project) return false;
   return isWorkspaceMember(userId, project.workspace_id);
 }
+
+/** Leads and automations carry project_id directly. */
+export async function isProjectResourceMember(
+  userId: string,
+  table: "leads" | "automations",
+  resourceId: string,
+): Promise<boolean> {
+  const db = createServiceRoleClient();
+  const { data: row } = await db.from(table).select("project_id").eq("id", resourceId).maybeSingle();
+  if (!row) return false;
+  return isProjectMember(userId, row.project_id);
+}
+
+/** Pages belong to a website, which belongs to a project. */
+export async function isPageMember(userId: string, pageId: string): Promise<boolean> {
+  const db = createServiceRoleClient();
+  const { data: page } = await db.from("pages").select("website_id").eq("id", pageId).maybeSingle();
+  if (!page) return false;
+  const { data: website } = await db
+    .from("websites")
+    .select("project_id")
+    .eq("id", page.website_id)
+    .maybeSingle();
+  if (!website) return false;
+  return isProjectMember(userId, website.project_id);
+}

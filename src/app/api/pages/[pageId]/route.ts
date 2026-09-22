@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isPageMember } from "@/lib/supabase/authorize";
 
 const bodySchema = z.object({
   seo: z
@@ -22,13 +23,17 @@ export async function PATCH(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isPageMember(user.id, pageId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Données invalides." }, { status: 422 });
   }
 
-  const { data: page, error } = await supabase.from("pages").update(parsed.data).eq("id", pageId).select("*").single();
+  const db = createServiceRoleClient();
+  const { data: page, error } = await db.from("pages").update(parsed.data).eq("id", pageId).select("*").single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ page });
 }

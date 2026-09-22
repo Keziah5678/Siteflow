@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { VersionsPanel } from "@/components/project/versions-panel";
 
 export default async function VersionsPage({
@@ -8,7 +8,7 @@ export default async function VersionsPage({
   params: Promise<{ workspace: string; project: string }>;
 }) {
   const { workspace: workspaceSlug, project: projectSlug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
 
   const { data: workspace } = await supabase.from("workspaces").select("id").eq("slug", workspaceSlug).maybeSingle();
   const { data: project } = await supabase

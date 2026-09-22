@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 export default async function DashboardIndexPage() {
   const supabase = await createClient();
@@ -8,7 +8,8 @@ export default async function DashboardIndexPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: memberships } = await supabase
+  const db = createServiceRoleClient();
+  const { data: memberships } = await db
     .from("workspace_members")
     .select("workspace:workspaces(slug)")
     .eq("user_id", user.id)

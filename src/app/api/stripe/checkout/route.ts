@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isWorkspaceMember } from "@/lib/supabase/authorize";
 import { getStripeClient, isStripeConfigured } from "@/lib/stripe";
 
 export async function POST(request: Request) {
@@ -25,8 +26,12 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isWorkspaceMember(user.id, workspaceId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
 
-  const { data: workspace } = await supabase
+  const db = createServiceRoleClient();
+  const { data: workspace } = await db
     .from("workspaces")
     .select("id, slug, name")
     .eq("id", workspaceId)
@@ -36,7 +41,7 @@ export async function POST(request: Request) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
   const stripe = getStripeClient();
 
-  const { data: settings } = await supabase
+  const { data: settings } = await db
     .from("settings")
     .select("billing")
     .eq("workspace_id", workspaceId)

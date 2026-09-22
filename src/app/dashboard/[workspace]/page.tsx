@@ -1,5 +1,5 @@
 import { FolderKanban } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Reveal";
 import { EmptyState } from "@/components/ui/empty-state";
 import { NewProjectDialog } from "@/components/dashboard/new-project-dialog";
@@ -12,7 +12,7 @@ export default async function WorkspaceProjectsPage({
   params: Promise<{ workspace: string }>;
 }) {
   const { workspace: workspaceSlug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
 
   const { data: workspace } = await supabase
     .from("workspaces")

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -14,7 +14,8 @@ import {
   History,
   Workflow,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isWorkspaceMember } from "@/lib/supabase/authorize";
 import { NavLink } from "@/components/dashboard/nav-link";
 import { Badge } from "@/components/ui/badge";
 import type { Project, ProjectStatus } from "@/lib/types";
@@ -35,15 +36,22 @@ export default async function ProjectLayout({
 }) {
   const { workspace: workspaceSlug, project: projectSlug } = await params;
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
-  const { data: workspace } = await supabase
+  const db = createServiceRoleClient();
+
+  const { data: workspace } = await db
     .from("workspaces")
     .select("id")
     .eq("slug", workspaceSlug)
     .maybeSingle();
   if (!workspace) notFound();
+  if (!(await isWorkspaceMember(user.id, workspace.id))) notFound();
 
-  const { data: project } = await supabase
+  const { data: project } = await db
     .from("projects")
     .select("*")
     .eq("workspace_id", workspace.id)

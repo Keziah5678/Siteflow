@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isProjectMember } from "@/lib/supabase/authorize";
 import { orchestrator } from "@/lib/ai/orchestrator";
 import { isAIConfigured, AIUnavailableError } from "@/lib/ai/client";
 import { enrichImages } from "@/lib/ai/enrich-images";
@@ -24,8 +25,13 @@ export async function POST(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectMember(user.id, projectId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
 
-  const { data: profile, error: profileError } = await supabase
+  const db = createServiceRoleClient();
+
+  const { data: profile, error: profileError } = await db
     .from("business_profiles")
     .select("*")
     .eq("project_id", projectId)
@@ -39,7 +45,7 @@ export async function POST(
     );
   }
 
-  const { data: website, error: websiteError } = await supabase
+  const { data: website, error: websiteError } = await db
     .from("websites")
     .select("*")
     .eq("project_id", projectId)
@@ -47,14 +53,14 @@ export async function POST(
   if (websiteError) return NextResponse.json({ error: websiteError.message }, { status: 400 });
   if (!website) return NextResponse.json({ error: "Site introuvable pour ce projet." }, { status: 404 });
 
-  await supabase.from("projects").update({ status: "generating" }).eq("id", projectId);
+  await db.from("projects").update({ status: "generating" }).eq("id", projectId);
 
   try {
     const { plan } = await orchestrator.generateWebsite(profile);
     const pagesWithImages = await enrichImages(plan.pages, orchestrator.images);
 
     // Design system: update the placeholder row created at project creation.
-    const { error: designError } = await supabase
+    const { error: designError } = await db
       .from("design_systems")
       .update({
         colors: plan.design_system.colors,
@@ -73,7 +79,7 @@ export async function POST(
       const base = slugify(profile.company) || "site";
       for (let attempt = 0; attempt < 6 && !publicSlug; attempt++) {
         const candidate = attempt === 0 ? base : `${base}-${attempt + 1}`;
-        const { error: slugError } = await supabase
+        const { error: slugError } = await db
           .from("websites")
           .update({ public_slug: candidate })
           .eq("id", website.id);
@@ -82,17 +88,17 @@ export async function POST(
       }
     }
 
-    await supabase
+    await db
       .from("websites")
       .update({ global_seo: plan.global_seo, status: "published" })
       .eq("id", website.id);
 
     // Replace any existing pages (regeneration case) — cascades to sections.
-    await supabase.from("pages").delete().eq("website_id", website.id);
+    await db.from("pages").delete().eq("website_id", website.id);
 
     for (let i = 0; i < pagesWithImages.length; i++) {
       const page = pagesWithImages[i];
-      const { data: insertedPage, error: pageError } = await supabase
+      const { data: insertedPage, error: pageError } = await db
         .from("pages")
         .insert({
           website_id: website.id,
@@ -114,7 +120,7 @@ export async function POST(
         content: section.content,
       }));
       if (sectionRows.length > 0) {
-        const { error: sectionsError } = await supabase.from("sections").insert(sectionRows);
+        const { error: sectionsError } = await db.from("sections").insert(sectionRows);
         if (sectionsError) throw new Error(sectionsError.message);
       }
     }
@@ -122,9 +128,9 @@ export async function POST(
     // Forms — best-effort, generation succeeding matters more than forms.
     try {
       const formsPlan = await orchestrator.forms.generate(profile);
-      await supabase.from("forms").delete().eq("project_id", projectId);
+      await db.from("forms").delete().eq("project_id", projectId);
       if (formsPlan.forms.length > 0) {
-        await supabase.from("forms").insert(
+        await db.from("forms").insert(
           formsPlan.forms.map((f) => ({
             project_id: projectId,
             name: f.name,
@@ -138,34 +144,34 @@ export async function POST(
     }
 
     // Snapshot the freshly generated site as the first version.
-    const { data: fullPages } = await supabase
+    const { data: fullPages } = await db
       .from("pages")
       .select("*, sections(*)")
       .eq("website_id", website.id)
       .order("nav_order");
-    const { data: designSystem } = await supabase
+    const { data: designSystem } = await db
       .from("design_systems")
       .select("*")
       .eq("project_id", projectId)
       .maybeSingle();
-    const { data: refreshedWebsite } = await supabase
+    const { data: refreshedWebsite } = await db
       .from("websites")
       .select("*")
       .eq("id", website.id)
       .single();
 
-    await supabase.from("site_versions").insert({
+    await db.from("site_versions").insert({
       website_id: website.id,
       label: "Génération initiale",
       snapshot: { website: refreshedWebsite, pages: fullPages, design_system: designSystem },
       created_by: user.id,
     });
 
-    await supabase.from("projects").update({ status: "active" }).eq("id", projectId);
+    await db.from("projects").update({ status: "active" }).eq("id", projectId);
 
     return NextResponse.json({ success: true, websiteId: website.id });
   } catch (err) {
-    await supabase.from("projects").update({ status: "draft" }).eq("id", projectId);
+    await db.from("projects").update({ status: "draft" }).eq("id", projectId);
     const message = err instanceof Error ? err.message : "La génération du site a échoué.";
     return NextResponse.json({ error: message }, { status: 500 });
   }

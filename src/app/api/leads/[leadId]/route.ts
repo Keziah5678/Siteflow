@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isProjectResourceMember } from "@/lib/supabase/authorize";
 
 const VALID_STATUSES = ["nouveau", "contacte", "qualifie", "rendez-vous", "proposition", "gagne", "perdu"];
 
@@ -14,6 +15,11 @@ export async function PATCH(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectResourceMember(user.id, "leads", leadId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
+
+  const db = createServiceRoleClient();
 
   const body = await request.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
@@ -28,7 +34,7 @@ export async function PATCH(
   }
 
   if (typeof body.note === "string" && body.note.trim()) {
-    const { data: current } = await supabase.from("leads").select("notes").eq("id", leadId).single();
+    const { data: current } = await db.from("leads").select("notes").eq("id", leadId).single();
     const notes = Array.isArray(current?.notes) ? current.notes : [];
     update.notes = [
       ...notes,
@@ -40,7 +46,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Rien à mettre à jour." }, { status: 422 });
   }
 
-  const { data, error } = await supabase.from("leads").update(update).eq("id", leadId).select("*").single();
+  const { data, error } = await db.from("leads").update(update).eq("id", leadId).select("*").single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
   return NextResponse.json({ lead: data });

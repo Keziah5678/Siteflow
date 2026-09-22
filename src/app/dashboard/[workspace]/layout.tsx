@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { LayoutGrid, Settings, Sprout } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { NavLink } from "@/components/dashboard/nav-link";
 import { WorkspaceSwitcher } from "@/components/dashboard/workspace-switcher";
 import { SignOutButton } from "@/components/dashboard/sign-out-button";
@@ -21,7 +21,8 @@ export default async function WorkspaceLayout({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: workspace } = await supabase
+  const db = createServiceRoleClient();
+  const { data: workspace } = await db
     .from("workspaces")
     .select("id, name, slug")
     .eq("slug", workspaceSlug)
@@ -29,7 +30,7 @@ export default async function WorkspaceLayout({
 
   if (!workspace) notFound();
 
-  const { data: memberships } = await supabase
+  const { data: memberships } = await db
     .from("workspace_members")
     .select("workspace:workspaces(slug, name)")
     .eq("user_id", user.id)

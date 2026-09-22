@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { SeoPanel } from "@/components/project/seo-panel";
 import type { Page, Website } from "@/lib/types";
 
@@ -10,7 +10,7 @@ export default async function SeoPage({
   params: Promise<{ workspace: string; project: string }>;
 }) {
   const { workspace: workspaceSlug, project: projectSlug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
 
   const { data: workspace } = await supabase.from("workspaces").select("id").eq("slug", workspaceSlug).maybeSingle();
   const { data: project } = await supabase

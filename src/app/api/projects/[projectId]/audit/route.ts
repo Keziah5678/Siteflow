@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isProjectMember } from "@/lib/supabase/authorize";
 import { orchestrator } from "@/lib/ai/orchestrator";
 import { getWebsiteSnapshot } from "@/lib/site/get-snapshot";
 import type { BusinessProfile } from "@/lib/types";
@@ -15,13 +16,18 @@ export async function POST(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectMember(user.id, projectId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
 
-  const snapshot = await getWebsiteSnapshot(supabase, projectId);
+  const db = createServiceRoleClient();
+
+  const snapshot = await getWebsiteSnapshot(db, projectId);
   if (!snapshot || snapshot.pages.length === 0) {
     return NextResponse.json({ error: "Générez d'abord votre site avant de lancer un audit." }, { status: 404 });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("business_profiles")
     .select("*")
     .eq("project_id", projectId)
@@ -33,7 +39,7 @@ export async function POST(
   const values = Object.values(result.scores);
   const overall = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
 
-  const { data: audit, error } = await supabase
+  const { data: audit, error } = await db
     .from("seo_audits")
     .insert({
       project_id: projectId,
@@ -54,7 +60,16 @@ export async function GET(
   const { projectId } = await params;
   const supabase = await createClient();
 
-  const { data: audits } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  if (!(await isProjectMember(user.id, projectId))) {
+    return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+  }
+
+  const db = createServiceRoleClient();
+  const { data: audits } = await db
     .from("seo_audits")
     .select("*")
     .eq("project_id", projectId)

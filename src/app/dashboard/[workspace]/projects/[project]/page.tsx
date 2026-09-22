@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { UserSquare2, Globe, Users, Search } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LinkButton } from "@/components/ui/button";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Reveal";
@@ -14,7 +14,7 @@ export default async function ProjectOverviewPage({
   params: Promise<{ workspace: string; project: string }>;
 }) {
   const { workspace: workspaceSlug, project: projectSlug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
 
   const { data: workspace } = await supabase
     .from("workspaces")
