@@ -1,0 +1,75 @@
+{
+  "expo": {
+    "name": "SHOPTV",
+    "slug": "shoptv",
+    "scheme": "shoptv",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#050509",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shoptv.app",
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.shoptv.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#050509",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "single",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-image",
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": false,
+          "supportsPictureInPicture": false
+        }
+      ],
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#050509"
+        }
+      ],
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-apple-authentication",
+      [
+        "expo-notifications",
+        {
+          "color": "#8B2CFF"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SHOPTV accède à vos photos pour votre avatar et les médias produits."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
