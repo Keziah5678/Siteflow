@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0d0d10" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 15 16 5l12 10v12H4z' fill='%23ffb469'/%3E%3C/svg%3E" />
+    <title>Appartement 3D</title>
+    <meta name="description" content="Studio avec jardin et spa, reconstruit en 3D et explorable à la première personne." />
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+
+    <!-- Chargement -->
+    <div id="loading" class="screen">
+      <div class="load-box">
+        <div class="brand">Appartement&nbsp;3D</div>
+        <div class="bar"><div id="load-fill"></div></div>
+        <div id="load-label">Préparation…</div>
+      </div>
+    </div>
+
+    <!-- Accueil -->
+    <div id="start" class="screen hidden">
+      <div class="card">
+        <p class="eyebrow">Visite libre à la première personne</p>
+        <h1>Studio &amp; jardin spa</h1>
+        <p class="lead">Chambre-séjour, kitchenette, salle de bain en marbre et jardin privatif avec spa, reconstruits en 3D d'après les photos.</p>
+        <button id="btn-start" class="primary">Explorer l'appartement</button>
+        <div class="keys desktop-only">
+          <div><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>se déplacer</span></div>
+          <div><kbd>Souris</kbd><span>regarder</span></div>
+          <div><kbd>E</kbd><span>interagir</span></div>
+          <div><kbd>Maj</kbd><span>courir</span></div>
+          <div><kbd>Échap</kbd><span>menu / libérer la souris</span></div>
+        </div>
+        <div class="keys touch-only">
+          <div><span>Joystick à gauche pour marcher, glissez à droite pour regarder, bouton <b>E</b> pour interagir.</span></div>
+        </div>
+        <label class="quality">Qualité graphique
+          <select id="sel-quality">
+            <option value="haute">Haute</option>
+            <option value="moyenne">Moyenne</option>
+            <option value="basse">Basse</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <!-- Interface en jeu -->
+    <div id="hud" class="hidden">
+      <div id="crosshair"></div>
+      <div id="prompt" class="hidden"><kbd>E</kbd><span id="prompt-text"></span></div>
+      <div id="room"></div>
+      <div id="toast"></div>
+      <div id="top-buttons">
+        <button id="btn-help" title="Afficher / masquer les commandes (H)">?</button>
+        <button id="btn-reset" title="Revenir au point de départ (R)">⟲</button>
+        <button id="btn-fullscreen" title="Plein écran (F)">⛶</button>
+        <button id="btn-menu" title="Menu (Échap)">☰</button>
+      </div>
+      <div id="help">
+        <div class="desktop-only">
+          <div><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> déplacement</div>
+          <div><kbd>Maj</kbd> courir · <kbd>Espace</kbd> sauter</div>
+          <div><kbd>E</kbd> interagir · <kbd>R</kbd> départ</div>
+          <div><kbd>N</kbd> jour / nuit · <kbd>L</kbd> lampe</div>
+          <div><kbd>F</kbd> plein écran · <kbd>H</kbd> aide</div>
+          <div><kbd>Échap</kbd> menu</div>
+        </div>
+        <div class="touch-only">Joystick : marcher · Glisser : regarder · E : interagir</div>
+      </div>
+      <div id="joystick" class="touch-only"><div id="knob"></div></div>
+      <div id="touch-buttons" class="touch-only">
+        <button id="btn-run">Courir</button>
+        <button id="btn-use">E</button>
+      </div>
+      <div id="fps"></div>
+    </div>
+
+    <!-- Menu pause -->
+    <div id="pause" class="screen hidden">
+      <div class="card">
+        <h2>Pause</h2>
+        <button id="btn-resume" class="primary">Reprendre l'exploration</button>
+        <label>Sensibilité de la souris <output id="out-sens"></output>
+          <input id="in-sens" type="range" min="0.2" max="3" step="0.05" />
+        </label>
+        <label>Vitesse de marche <output id="out-speed"></output>
+          <input id="in-speed" type="range" min="0.8" max="3" step="0.05" />
+        </label>
+        <div class="row">
+          <button id="btn-daynight">Passer en mode nuit</button>
+          <button id="btn-reset2">Revenir au départ</button>
+        </div>
+        <div class="row">
+          <label class="check"><input id="chk-help" type="checkbox" checked /> Afficher les commandes</label>
+          <label class="check"><input id="chk-sound" type="checkbox" checked /> Sons</label>
+          <label class="check"><input id="chk-invert" type="checkbox" /> Inverser l'axe Y</label>
+        </div>
+        <div class="row">
+          <button id="btn-fullscreen2">Plein écran</button>
+          <label class="quality">Qualité
+            <select id="sel-quality2">
+              <option value="haute">Haute</option>
+              <option value="moyenne">Moyenne</option>
+              <option value="basse">Basse</option>
+            </select>
+          </label>
+        </div>
+        <p class="note">La qualité graphique s'applique après rechargement de la page.</p>
+      </div>
+    </div>
+
+    <div id="error" class="screen hidden"><div class="card"><h2>WebGL indisponible</h2><p id="error-text"></p></div></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

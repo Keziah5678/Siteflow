@@ -1,0 +1,25 @@
+{
+  "name": "appartement-3d",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Appartement explorable en 3D à la première personne (Three.js + Vite + TypeScript)",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "build:single": "tsc --noEmit && vite build --mode single",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "node scripts/e2e.mjs"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.7",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}

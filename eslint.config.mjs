@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Projet Three.js autonome (Vite), avec sa propre configuration TypeScript.
+    "appartement-3d/**",
   ]),
 ]);
 
