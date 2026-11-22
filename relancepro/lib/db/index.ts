@@ -50,3 +50,7 @@ export async function closeDb() {
  * *string*, which is why JSON.stringify must never be used for jsonb.
  */
 export const jsonb = (v: unknown) => v as never;
+
+/** A database row as returned by postgres.js (columns camelCased). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DbRow = Record<string, any>;

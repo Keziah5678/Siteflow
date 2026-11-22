@@ -1,6 +1,6 @@
 import "server-only";
 import { z } from "zod";
-import { jsonb, system, withTenant, type Db } from "../db";
+import { jsonb, system, withTenant, type Db, type DbRow } from "../db";
 import { isForgotten } from "../ai/engine";
 import { enqueue } from "../jobs/queue";
 import { env } from "../server/env";
@@ -50,7 +50,7 @@ export async function listSequences(ctx: OrgContext) {
   return withTenant(ctx.userId, async tx => {
     const seqs = await tx`select s.*, (select count(*)::int from rp.enrollments e where e.sequence_id = s.id and e.status = 'active') as active_count from rp.sequences s where s.org_id = ${ctx.orgId} order by s.created_at`;
     const steps = await tx`select * from rp.sequence_steps where org_id = ${ctx.orgId} order by position`;
-    return seqs.map(s => ({ ...s, steps: steps.filter(st => st.sequenceId === s.id) }));
+    return (seqs as unknown as Array<DbRow>).map((s): DbRow => ({ ...s, steps: steps.filter(st => st.sequenceId === s.id) }));
   });
 }
 

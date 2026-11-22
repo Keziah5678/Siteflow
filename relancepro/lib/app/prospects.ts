@@ -1,6 +1,6 @@
 import "server-only";
 import { z } from "zod";
-import { jsonb, system, withTenant, type Tx } from "../db";
+import { jsonb, system, withTenant, type DbRow, type Tx } from "../db";
 import { analyzeMessage, scoreProspect, isForgotten } from "../ai/engine";
 import { emailHash } from "../server/crypto";
 import { emitWebhook } from "./webhooks";
@@ -223,7 +223,7 @@ export async function listProspects(ctx: OrgContext, f: ProspectFilter = {}) {
     order by ${f.sort === "name" ? tx`p.last_name, p.first_name` : f.sort === "recent" ? tx`p.created_at desc` : tx`p.ai_score desc nulls last, p.created_at desc`}
     limit 500`);
   const now = new Date();
-  const mapped = rows.map(r => ({ ...r, forgotten: isForgotten({ status: r.status as string, lastInboundAt: r.lastInboundAt as Date | null, lastOutboundAt: r.lastOutboundAt as Date | null, createdAt: r.createdAt as Date }, followUp, now) }));
+  const mapped = (rows as unknown as Array<DbRow>).map((r): DbRow => ({ ...r, forgotten: isForgotten({ status: r.status as string, lastInboundAt: r.lastInboundAt as Date | null, lastOutboundAt: r.lastOutboundAt as Date | null, createdAt: r.createdAt as Date }, followUp, now) }));
   return f.forgotten ? mapped.filter(r => r.forgotten) : mapped;
 }
 
