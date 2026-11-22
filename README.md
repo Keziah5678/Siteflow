@@ -148,3 +148,12 @@ depuis ce dépôt :
 5. **Domaines personnalisés** : chaque site est aujourd'hui servi sur `/s/<identifiant-public>`. Le champ `websites.domain` existe pour un mapping de domaine personnalisé, mais le routage DNS/certificat correspondant doit être mis en place au niveau de l'hébergeur (Vercel Domains ou équivalent).
 6. **Exécution réelle des automatisations** : les automatisations sont créées et activables dans l'interface, mais l'envoi effectif (email, webhook) nécessite de connecter un fournisseur (ex. Resend, Postmark, ou un webhook sortant) — non implémenté, pour ne pas simuler un envoi qui n'aurait pas lieu.
 7. **Déploiement** : déployez sur Vercel (ou tout hébergeur Next.js) avec les variables d'environnement ci-dessus.
+
+---
+
+## ARTHENIS — `arthenis/`
+
+Plateforme de création et de simulation d'univers vivants (Next.js 16, React
+Three Fiber, Supabase), reprise de `Keziah5678/Arthenis-beta`. Application
+autonome avec sa propre configuration : voir [`arthenis/README.md`](arthenis/README.md)
+et l'état des fonctionnalités dans [`arthenis/STATUS.md`](arthenis/STATUS.md).
