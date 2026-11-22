@@ -24,6 +24,7 @@ const eslintConfig = defineConfig([
     "appartement-3d/**",
     // Application Arthenis autonome, avec sa propre configuration.
     "arthenis/**",
+    "relancepro/**",
   ]),
 ]);
 
