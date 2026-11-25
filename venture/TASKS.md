@@ -53,7 +53,8 @@ Statuts : **Terminé et testé** · **En cours** · **À faire** · **Bloqué** 
 | Administration (signalements, modération, utilisateurs, projets, offres, paiements, coûts IA, paramètres, audit) avec rôles | Terminé et testé | I, E |
 | Offres Free / Plus / Business, prix éditables | Terminé et testé | E |
 | Stripe : webhook signé, idempotence, activation / résiliation | Terminé et testé (événements signés localement) | I |
-| Stripe : session de paiement réelle en mode test, portail client | **Bloqué** — clés Stripe test non fournies (code prêt, non exécuté contre l'API Stripe) | — |
+| Stripe : session de paiement réelle en mode test | Terminé et testé contre l'API Stripe (mode test) : client et session Checkout créés par l'application ; abonnement payé avec la carte de test ; événements Stripe réels rejoués sur le webhook (activation, rejeu ignoré, résiliation) | manuel + I |
+| Stripe : affichage de la page de paiement hébergée et portail client | Non vérifiable ici — `checkout.stripe.com` bloqué par le proxy du sandbox | — |
 | Export / suppression des données personnelles | Terminé et testé | E |
 
 ## Phase 5 — À venir

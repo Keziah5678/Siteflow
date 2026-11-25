@@ -48,7 +48,7 @@ update public.profiles set platform_role = 'superadmin' where username = 'votre_
 
 ```bash
 npm run typecheck && npm run lint
-npm test               # 80 tests unitaires + intégration (RLS, Stripe, IA) sur la base locale
+npm test               # 81 tests unitaires + intégration (RLS, Stripe, IA) sur la base locale
 npm run build && npm run test:e2e   # 20 scénarios Playwright, dont le parcours d'acceptation complet
 ```
 

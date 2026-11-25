@@ -71,6 +71,17 @@ describe("Stripe webhook", () => {
     expect(q?.[0]?.monthly_credits).toBe(300);
   });
 
+  it("activates the plan from customer.subscription.created (subscriptions created outside Checkout)", async () => {
+    const { POST } = await import("@/app/api/stripe/webhook/route");
+    await admin.from("profiles").update({ plan: "free" }).eq("id", buyer.id);
+    const r = await POST(signed({ id: `evt_created_${Date.now()}`, object: "event", type: "customer.subscription.created", data: { object: { id: "sub_test_123", object: "subscription", status: "active", metadata: { user_id: buyer.id, plan: "plus" }, items: { data: [{ current_period_end: 1893456000 }] } } } }));
+    expect(r.status).toBe(200);
+    const { data } = await admin.from("profiles").select("plan").eq("id", buyer.id).single();
+    expect(data?.plan).toBe("plus");
+    const { data: sub } = await admin.from("subscriptions").select("current_period_end").eq("user_id", buyer.id).single();
+    expect(sub?.current_period_end).toContain("2030-01-01");
+  });
+
   it("downgrades to free when the subscription is deleted", async () => {
     const { POST } = await import("@/app/api/stripe/webhook/route");
     const r = await POST(signed({ id: `evt_del_${Date.now()}`, object: "event", type: "customer.subscription.deleted", data: { object: { id: "sub_test_123", object: "subscription", status: "canceled", metadata: { user_id: buyer.id, plan: "plus" }, items: { data: [] } } } }));

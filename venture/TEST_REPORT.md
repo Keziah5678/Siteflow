@@ -9,11 +9,11 @@
 | TypeScript strict | `npm run typecheck` | ✅ 0 erreur |
 | Lint | `npm run lint` | ✅ 0 erreur, 0 avertissement |
 | Unitaires | `npx vitest run tests/unit` | ✅ 37 / 37 |
-| Intégration (vraie base, vrais JWT) | `npx vitest run tests/integration` | ✅ 43 / 43 (36 RLS/règles métier + 7 Stripe/IA) |
+| Intégration (vraie base, vrais JWT) | `npx vitest run tests/integration` | ✅ 44 / 44 (36 RLS/règles métier + 8 Stripe/IA) |
 | Build production | `npm run build` | ✅ 34 routes |
 | E2E Playwright | `npm run test:e2e` | ✅ 20 / 20 |
 
-Total : **80 tests Vitest + 20 scénarios E2E**, exécutés après `supabase db reset` (base propre).
+Total : **81 tests Vitest + 20 scénarios E2E**, exécutés après `supabase db reset` (base propre).
 
 ## Critères d'acceptation (cahier des charges §24)
 
@@ -47,7 +47,7 @@ Parcours exécuté dans le navigateur par **deux comptes réels** (`tests/e2e/ac
 | Erreurs réseau | UI : messages en échec marqués « Échec de l'envoi », indicateur de reconnexion temps réel, page d'erreur globale, page hors ligne PWA, carte avec repli explicite — **non automatisé** (vérification manuelle) |
 | Données inexistantes | E2E : projet inexistant → 404 |
 | Écrans de chargement | squelettes `(main)/loading.tsx`, états `pending` des boutons — vérification visuelle |
-| Paiements mode test | I : webhook avec événements signés localement (signature absente/forgée refusée, activation du plan, rejeu ignoré, un seul paiement, résiliation → free) — la création de session Checkout contre l'API Stripe n'a **pas** été exécutée (pas de clé test) |
+| Paiements mode test | I : webhook (signature absente/forgée refusée, activation via `checkout.session.completed` et `customer.subscription.created`, rejeu ignoré, un seul paiement, résiliation → free). **API Stripe réelle (mode test)** : depuis l'application, « Choisir Plus » crée le client Stripe et une session Checkout (abonnement, 9,99 €, `livemode=false`) ; abonnement payé avec `pm_card_visa` (facture `paid`) ; les événements réels `customer.subscription.created` / `deleted` récupérés chez Stripe et rejoués sur le webhook local passent le plan à `plus` puis `free`, le rejeu est ignoré ; données de test supprimées ensuite. Non vérifiable : la page hébergée `checkout.stripe.com` (bloquée par le proxy du sandbox) |
 | Formats d'écran | E2E mobile 390×844 : 5 onglets, pas de défilement horizontal ; captures desktop 1440×900 (sombre et clair) inspectées |
 | Signalements et blocages | I + E2E : signalement, file de modération, masquage, suspension, blocage empêchant les messages |
 | Limitation de débit | I : 31ᵉ commentaire en 10 min refusé ; E2E : 6ᵉ inscription/heure depuis la même IP refusée (constaté) |
@@ -67,6 +67,6 @@ Parcours exécuté dans le navigateur par **deux comptes réels** (`tests/e2e/ac
 ## Non vérifiable dans cet environnement
 
 - Appel réel à l'API IA (clé absente).
-- API Stripe (clés absentes).
+- Page de paiement hébergée Stripe (`checkout.stripe.com` bloqué par le proxy du sandbox).
 - Tuiles cartographiques OpenFreeMap (hôte bloqué par le proxy réseau du bac à sable) : moteur, marqueurs et popups vérifiés avec un style local intercepté.
 - Installation PWA sur appareil réel, Safari/Firefox (seul Chromium testé).

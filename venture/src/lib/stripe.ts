@@ -1,5 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -13,7 +14,10 @@ export function getStripe(): Stripe | null {
     // Safety net: live mode must be enabled explicitly.
     throw new Error("Clé Stripe live détectée sans STRIPE_ALLOW_LIVE=true.");
   }
-  stripe ??= new Stripe(key, { maxNetworkRetries: 2, appInfo: { name: "VENTURE" } });
+  // Honour an outbound HTTPS proxy when one is configured (corporate networks,
+  // sandboxes). The Stripe SDK uses Node's https module, which ignores HTTPS_PROXY.
+  const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+  stripe ??= new Stripe(key, { maxNetworkRetries: 2, appInfo: { name: "VENTURE" }, ...(proxy ? { httpAgent: new HttpsProxyAgent(proxy) } : {}) });
   return stripe;
 }
 
@@ -39,6 +43,7 @@ export async function applyStripeEvent(db: SupabaseClient<Database>, event: Stri
       );
       return "handled";
     }
+    case "customer.subscription.created":
     case "customer.subscription.updated":
     case "customer.subscription.deleted": {
       const sub = event.data.object as Stripe.Subscription;

@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [0.1.1] — 2026-11-25
+
+### Ajouté
+- Webhook Stripe : prise en charge de `customer.subscription.created` (abonnements créés hors Checkout).
+- Client Stripe : respect de `HTTPS_PROXY` (réseaux d'entreprise, sandbox).
+
+### Vérifié
+- Parcours de paiement contre l'API Stripe réelle en mode test (voir TEST_REPORT.md).
+
 ## [0.1.0] — 2026-11-25 — Première version fonctionnelle (MVP phases 1 à 4)
 
 ### Ajouté
