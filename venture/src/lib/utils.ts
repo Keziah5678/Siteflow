@@ -34,6 +34,7 @@ export function timeAgo(d: string | Date): string {
 
 export function initials(name: string): string {
   return name
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)

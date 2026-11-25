@@ -28,6 +28,12 @@ export async function POST(request: Request) {
     }
   }
 
+  // Files of projects the user owns (the rows are removed by cascade).
+  const { data: owned } = await admin.from("projects").select("id").eq("owner_id", user.id);
+  for (const p of owned ?? []) {
+    const { data: files } = await admin.storage.from("project-files").list(p.id, { limit: 1000 });
+    if (files?.length) await admin.storage.from("project-files").remove(files.map((f) => `${p.id}/${f.name}`));
+  }
   // Remove the user's files from storage (avatars, covers they uploaded).
   for (const bucket of ["avatars", "covers"] as const) {
     const { data: files } = await admin.storage.from(bucket).list(user.id, { limit: 1000 });

@@ -116,7 +116,7 @@ export default async function ExplorePage(props: PageProps<"/explore">) {
       <nav className="scrollbar-none -mx-4 mt-5 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-5 sm:px-0" aria-label="Univers">
         {UNIVERSES.map((x) => (
           <Link key={x.key} href={`/explore?u=${x.key}${q ? `&q=${encodeURIComponent(q)}` : ""}`} aria-current={u === x.key ? "page" : undefined} className={cn("flex shrink-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-[13px] font-medium transition-colors", u === x.key ? "border-primary bg-primary-soft" : "border-border text-muted hover:border-border-strong hover:text-fg")}>
-            <x.icon className="size-4" /> {x.label}
+            <x.icon className="size-4 shrink-0" /> <span className="truncate">{x.label}</span>
           </Link>
         ))}
       </nav>

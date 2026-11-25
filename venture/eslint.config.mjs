@@ -12,5 +12,5 @@ export default defineConfig([
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "playwright-report/**", "test-results/**", "src/lib/supabase/database.types.ts"]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "playwright-report/**", "test-results/**", "src/lib/supabase/database.types.ts", "public/maplibre/**", "public/sw.js"]),
 ]);

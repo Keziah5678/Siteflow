@@ -15,14 +15,16 @@ declare
   brand uuid := '00000000-0000-4000-8000-0000000000f2';
   game uuid := '00000000-0000-4000-8000-0000000000f3';
 begin
-  insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_user_meta_data, raw_app_meta_data, created_at, updated_at)
+  -- Token columns must be '' (not NULL): GoTrue cannot scan NULLs there.
+  insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_user_meta_data, raw_app_meta_data, created_at, updated_at,
+    confirmation_token, recovery_token, email_change_token_new, email_change, email_change_token_current, phone_change, phone_change_token, reauthentication_token)
   values
     (thomas, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'thomas.demo@venture.invalid', '!demo-no-login', now(),
-     '{"display_name":"Thomas (démo)","username":"thomas_demo","birthdate":"1994-05-12"}', '{"provider":"email","providers":["email"]}', now(), now()),
+     '{"display_name":"Thomas (démo)","username":"thomas_demo","birthdate":"1994-05-12"}', '{"provider":"email","providers":["email"]}', now(), now(), '', '', '', '', '', '', '', ''),
     (lea, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'lea.demo@venture.invalid', '!demo-no-login', now(),
-     '{"display_name":"Léa (démo)","username":"lea_demo","birthdate":"1997-09-02"}', '{"provider":"email","providers":["email"]}', now(), now()),
+     '{"display_name":"Léa (démo)","username":"lea_demo","birthdate":"1997-09-02"}', '{"provider":"email","providers":["email"]}', now(), now(), '', '', '', '', '', '', '', ''),
     (karim, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'karim.demo@venture.invalid', '!demo-no-login', now(),
-     '{"display_name":"Karim (démo)","username":"karim_demo","birthdate":"1990-01-20"}', '{"provider":"email","providers":["email"]}', now(), now())
+     '{"display_name":"Karim (démo)","username":"karim_demo","birthdate":"1990-01-20"}', '{"provider":"email","providers":["email"]}', now(), now(), '', '', '', '', '', '', '', '')
   on conflict (id) do nothing;
 
   update public.profiles set

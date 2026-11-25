@@ -39,6 +39,11 @@ function revalidateProject(id: string) {
 // ---------------------------------------------------------------------------
 // Create / update / delete
 // ---------------------------------------------------------------------------
+/** Covers must come from our own public "covers" bucket (no third-party URLs). */
+function isOwnCover(url: string | null): boolean {
+  return url === null || url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/covers/`);
+}
+
 function projectRow(d: ProjectInput) {
   const city = findCity(d.city);
   return {
@@ -62,6 +67,7 @@ function projectRow(d: ProjectInput) {
 export async function createProjectAction(raw: unknown): Promise<ActionState> {
   const parsed = projectSchema.safeParse(raw);
   if (!parsed.success) return { error: "Corrige les champs indiqués.", fields: fieldErrors(parsed.error) };
+  if (!isOwnCover(parsed.data.cover_url)) return { error: "Image de couverture invalide." };
   const { supabase, user } = await authed();
   if (!user) return { error: "Connecte-toi pour publier un projet." };
   const d = parsed.data;
@@ -99,6 +105,7 @@ export async function updateProjectAction(projectId: string, raw: unknown): Prom
   if (!uuid.safeParse(projectId).success) return { error: "Projet invalide." };
   const parsed = projectSchema.safeParse(raw);
   if (!parsed.success) return { error: "Corrige les champs indiqués.", fields: fieldErrors(parsed.error) };
+  if (!isOwnCover(parsed.data.cover_url)) return { error: "Image de couverture invalide." };
   const { supabase, user } = await authed();
   if (!user) return { error: "Session expirée." };
   const d = parsed.data;

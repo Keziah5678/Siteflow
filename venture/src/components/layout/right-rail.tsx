@@ -36,7 +36,7 @@ export async function RightRail() {
               <span className="min-w-0 flex-1">
                 <span className="line-clamp-2 text-[14px] font-medium leading-snug">{p.title}</span>
                 <span className="mt-1 flex items-center gap-2 text-[12px] text-subtle">
-                  {CATEGORY_LABEL[p.category]} · <TrendingUp className="size-3" /> {formatNumber(p.interest_count)} intéressés
+                  {CATEGORY_LABEL[p.category]} · <TrendingUp className="size-3" /> {formatNumber(p.interest_count)} intéressé{p.interest_count > 1 ? "s" : ""}
                   {p.is_demo && <span className="text-warning">· démo</span>}
                 </span>
               </span>

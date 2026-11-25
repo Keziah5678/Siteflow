@@ -27,6 +27,10 @@ const optionalUrl = z
   .refine((v) => v == null || /^https?:\/\/[^\s]+$/i.test(v), "L'URL doit commencer par http:// ou https://")
   .transform((v) => v ?? null);
 
+/** Optional number from forms: "", null and undefined become null (never 0). */
+const optionalNumber = (schema: z.ZodNumber) =>
+  z.preprocess((v) => (v === "" || v == null ? null : v), z.coerce.number().pipe(schema).nullable()).optional().transform((v) => v ?? null);
+
 export function isAdult(birthdate: string, now = new Date()): boolean {
   const d = new Date(birthdate + "T00:00:00Z");
   if (Number.isNaN(d.getTime())) return false;
@@ -92,19 +96,19 @@ export const projectSchema = z.object({
   category: z.enum(["business", "event", "people", "creation", "opportunity"]),
   status: z.enum(["idea", "recruiting", "preparing", "in_progress", "completed", "cancelled"]).default("recruiting"),
   goal: optionalText(200),
-  interest_goal: z.coerce.number().int().min(1).max(10_000_000).nullable().optional().catch(null),
+  interest_goal: optionalNumber(z.number().int().min(1).max(10_000_000)),
   skills_needed: tags(15),
   resources_needed: tags(15),
-  budget_estimate_eur: z.coerce.number().min(0).max(1_000_000_000).nullable().optional().catch(null),
+  budget_estimate_eur: optionalNumber(z.number().min(0).max(1_000_000_000)),
   city: optionalText(80),
   is_remote: z.boolean().default(false),
   cover_url: optionalUrl,
   first_steps: tags(12).optional(),
   // Event-specific (optional)
   venue_idea: optionalText(200),
-  capacity: z.coerce.number().int().min(1).max(1_000_000).nullable().optional().catch(null),
-  price_min_eur: z.coerce.number().min(0).max(100_000).nullable().optional().catch(null),
-  price_max_eur: z.coerce.number().min(0).max(100_000).nullable().optional().catch(null),
+  capacity: optionalNumber(z.number().int().min(1).max(1_000_000)),
+  price_min_eur: optionalNumber(z.number().min(0).max(100_000)),
+  price_max_eur: optionalNumber(z.number().min(0).max(100_000)),
   date_options: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(6).optional(),
 });
 export type ProjectInput = z.infer<typeof projectSchema>;
@@ -169,7 +173,7 @@ export const proposalSchema = z.object({
   message: z.string().trim().min(10).max(2000),
   proposed_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional().catch(null),
   proposed_venue: optionalText(200),
-  proposed_price_eur: z.coerce.number().min(0).max(100_000).nullable().optional().catch(null),
+  proposed_price_eur: optionalNumber(z.number().min(0).max(100_000)),
 });
 
 /** Flattens Zod issues into { field: message } for forms. */

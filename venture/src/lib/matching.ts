@@ -44,17 +44,30 @@ export type MatchResult = {
 export function normalizeTag(s: string): string {
   return s
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9+#]+/g, " ")
-    .trim()
-    .replace(/s\b/g, ""); // naive singularisation: "photographes" ≈ "photographe"
+    .trim();
 }
 
-/** Loose equality: exact normalised match, or one contains the other (≥4 chars). */
+// Light French/English stemming so "Photographes" ≈ "Photographie",
+// "Organisateurs" ≈ "Organisation", "Designer" ≈ "Design".
+const SUFFIXES = ["ations", "ation", "ateurs", "ateur", "atrices", "atrice", "euses", "euse", "eurs", "eur", "istes", "iste", "ies", "ie", "ers", "er", "ing", "es", "e", "s"];
+function stemWord(w: string): string {
+  if (w.length <= 4) return w;
+  for (const suf of SUFFIXES) {
+    if (w.endsWith(suf) && w.length - suf.length >= 4) return w.slice(0, -suf.length);
+  }
+  return w;
+}
+export function stemTag(s: string): string {
+  return normalizeTag(s).split(" ").map(stemWord).join(" ");
+}
+
+/** Loose equality on stems: exact, or one contains the other (≥4 chars). */
 export function tagsMatch(a: string, b: string): boolean {
-  const x = normalizeTag(a);
-  const y = normalizeTag(b);
+  const x = stemTag(a);
+  const y = stemTag(b);
   if (!x || !y) return false;
   if (x === y) return true;
   const [short, long] = x.length <= y.length ? [x, y] : [y, x];

@@ -135,7 +135,7 @@ export default async function ProjectPage(props: PageProps<"/projects/[id]">) {
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <div className="mb-1.5 flex items-baseline justify-between text-[13px]">
-              <span><strong className="text-[20px] font-semibold">{formatNumber(project.interest_count)}</strong> <span className="text-muted">intéressés</span></span>
+              <span><strong className="text-[20px] font-semibold">{formatNumber(project.interest_count)}</strong> <span className="text-muted">intéressé{project.interest_count > 1 ? "s" : ""}</span></span>
               {project.interest_goal && <span className="text-subtle">Objectif : {formatNumber(project.interest_goal)}</span>}
             </div>
             {interestPct != null && <Progress value={interestPct} label="Intérêt par rapport à l'objectif" />}

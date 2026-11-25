@@ -81,9 +81,9 @@ export function CreateFlow({ userId, initialIdea, aiAvailable, aiRemaining }: { 
         className="mt-5 w-full resize-none rounded-2xl border border-border bg-card px-4 py-4 text-[16px] leading-relaxed placeholder:text-subtle focus:border-primary-2 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
       />
       {error && <Notice tone="warning" className="mt-3">{error}</Notice>}
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         {aiAvailable && (
-          <Button size="lg" onClick={withAI} disabled={!ideaOk || loading || (aiRemaining != null && aiRemaining < 1)} className="sm:col-span-1">
+          <Button size="lg" onClick={withAI} disabled={!ideaOk || loading || (aiRemaining != null && aiRemaining < 1)}>
             {loading ? <Loader2 className="animate-spin" /> : <Sparkles />} Structurer avec l'IA
           </Button>
         )}

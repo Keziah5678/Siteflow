@@ -16,6 +16,7 @@ export function ProjectMap({ points }: { points: MapPoint[] }) {
     (async () => {
       try {
         const maplibre = await import("maplibre-gl");
+        maplibre.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
         if (cancelled || !ref.current) return;
         const m = new maplibre.Map({ container: ref.current, style: publicEnv.mapStyleUrl, center: [2.35, 46.6], zoom: 4.6, attributionControl: { compact: true } });
         map = m;
