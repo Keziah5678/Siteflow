@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap" style="max-width:640px">
+  <div class="card" id="page" data-page="pay">
+    <h1 style="font-size:26px;margin:0 0 8px">Continuer avec ChantierAlerte</h1>
+    <p class="price">{{ site.price_eur_month }} €<small> / mois, sans engagement</small></p>
+    <ul class="checks"><li>Toutes vos alertes, chaque matin</li><li>Paiement sécurisé par Stripe</li><li>Résiliable à tout moment</li></ul>
+    <p id="pay-zone"></p>
+  </div>
+</div></section>
+{% endblock %}

@@ -1,0 +1,28 @@
+{
+  "_LISEZ_MOI": "Remplissez les champs « A_REMPLIR ». Rien ici n'est secret : ce fichier est publié avec le site.",
+
+  "site_url": "https://A_REMPLIR.github.io/A_REMPLIR",
+  "stripe_payment_link": "",
+  "price_eur_month": 12,
+  "trial_days": 14,
+
+  "contact_email": "A_REMPLIR@exemple.fr",
+
+  "editeur": {
+    "nom_ou_raison_sociale": "A_REMPLIR (ex. Jean Dupont, entrepreneur individuel)",
+    "forme_juridique": "A_REMPLIR (ex. Entreprise individuelle / micro-entreprise / SAS)",
+    "adresse": "A_REMPLIR",
+    "siret": "A_REMPLIR",
+    "tva_intracommunautaire": "Non applicable, art. 293 B du CGI (si micro-entreprise) — A_REMPLIR",
+    "directeur_publication": "A_REMPLIR",
+    "telephone": "A_REMPLIR"
+  },
+
+  "hebergeur": {
+    "nom": "GitHub, Inc.",
+    "adresse": "88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis",
+    "site": "https://github.com"
+  },
+
+  "mediateur_consommation": "A_REMPLIR (obligatoire si vous vendez à des particuliers ; vos clients sont des professionnels, à vérifier avec votre conseil)"
+}

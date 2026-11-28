@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap" style="max-width:640px"><div class="card">
+  <h1 style="font-size:26px;margin:0 0 8px">Merci, votre abonnement est enregistré</h1>
+  <p class="lead">Votre compte passe en abonnement payant lors du prochain passage du robot (chaque matin, avant l'envoi des alertes). Vous n'avez rien d'autre à faire.</p>
+  <p class="small">Un reçu vous a été envoyé par Stripe. Pour toute question : <a href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a>.</p>
+</div></div></section>
+{% endblock %}

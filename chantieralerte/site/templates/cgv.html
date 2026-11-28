@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap legal">
+  <h1>Conditions générales de vente</h1>
+  <p class="small">Document à faire valider par un professionnel avant mise en ligne. Dernière mise à jour : {{ updated }}.</p>
+  <h2>1. Objet</h2>
+  <p>Les présentes conditions régissent l'abonnement au service ChantierAlerte, édité par {{ e.nom_ou_raison_sociale|todo }} (SIRET {{ e.siret|todo }}), qui envoie par email une sélection d'appels d'offres publics issus du BOAMP selon les métiers et départements choisis par l'abonné. Le service s'adresse aux professionnels.</p>
+  <h2>2. Essai gratuit</h2>
+  <p>Après confirmation de son adresse email, l'abonné bénéficie d'un essai gratuit de {{ site.trial_days }} jours, sans moyen de paiement. À l'issue de l'essai, les alertes s'interrompent sauf souscription de l'abonnement payant. Aucun prélèvement n'a lieu automatiquement à la fin de l'essai.</p>
+  <h2>3. Prix et paiement</h2>
+  <p>L'abonnement coûte {{ site.price_eur_month }} € par mois ({{ e.tva_intracommunautaire|todo }}). Le paiement est mensuel, par carte bancaire, via la plateforme sécurisée Stripe. L'abonnement est reconduit chaque mois jusqu'à résiliation.</p>
+  <h2>4. Résiliation</h2>
+  <p>L'abonné peut résilier à tout moment depuis son espace client Stripe ou sur simple demande à {{ site.contact_email|todo }}. La résiliation prend effet à la fin de la période mensuelle en cours ; aucun prorata n'est remboursé.</p>
+  <h2>5. Nature du service et responsabilité</h2>
+  <p>ChantierAlerte est un service de veille. Les informations proviennent d'une source publique (BOAMP) et sont sélectionnées et résumées automatiquement : des erreurs ou omissions sont possibles. Seul l'avis officiel fait foi, notamment pour les dates limites. L'éditeur ne garantit ni l'exhaustivité de la sélection ni l'obtention d'un marché. Le service peut être temporairement indisponible, notamment en cas d'indisponibilité de la source publique.</p>
+  <h2>6. Données personnelles</h2>
+  <p>Voir la <a href="confidentialite.html">politique de confidentialité</a>.</p>
+  <h2>7. Droit applicable et litiges</h2>
+  <p>Les présentes conditions sont soumises au droit français. Médiation : {{ site.mediateur_consommation|todo }}. À défaut d'accord amiable, les tribunaux compétents sont ceux du ressort du siège de l'éditeur.</p>
+</div></section>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap">
+  <p class="crumbs"><a href="{{ root }}">Accueil</a> › Appels d'offres</p>
+  <h1 style="font-size:clamp(24px,6vw,36px);margin:0 0 10px">Appels d'offres publics du BTP par métier</h1>
+  <p class="lead">Les derniers marchés publics de travaux publiés au BOAMP, triés par corps de métier et par département.</p>
+  {% for t in trades %}
+  <h2 style="font-size:20px;margin-top:22px"><a href="{{ root }}appels-offres/{{ t.slug }}/">{{ t.label }}</a> <span class="small">({{ t.count }} avis récents)</span></h2>
+  {% endfor %}
+</div></section>
+{% endblock %}

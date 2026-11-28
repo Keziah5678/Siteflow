@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap legal">
+  <h1>Mentions légales</h1>
+  <h2>Éditeur du site</h2>
+  <p>{{ e.nom_ou_raison_sociale|todo }}<br>{{ e.forme_juridique|todo }}<br>Adresse : {{ e.adresse|todo }}<br>SIRET : {{ e.siret|todo }}<br>TVA : {{ e.tva_intracommunautaire|todo }}<br>Téléphone : {{ e.telephone|todo }}<br>Email : {{ site.contact_email|todo }}</p>
+  <p>Directeur de la publication : {{ e.directeur_publication|todo }}</p>
+  <h2>Hébergement</h2>
+  <p>Site : {{ site.hebergeur.nom }}, {{ site.hebergeur.adresse }} — {{ site.hebergeur.site }}<br>
+  Base de données : Supabase, Inc. (région choisie : Union européenne).<br>Envoi des emails : Brevo (Sendinblue SAS), 106 boulevard Haussmann, 75008 Paris, France.<br>Paiements : Stripe Payments Europe, Ltd., Dublin, Irlande.</p>
+  <h2>Données publiques</h2>
+  <p>Les avis présentés proviennent du Bulletin officiel des annonces des marchés publics (BOAMP), publié par la Direction de l'information légale et administrative (DILA), réutilisés sous Licence Ouverte. Les résumés sont générés automatiquement : seul l'avis officiel fait foi.</p>
+  <h2>Propriété intellectuelle</h2>
+  <p>La structure du site, les textes et la marque ChantierAlerte sont la propriété de l'éditeur, hors données publiques du BOAMP.</p>
+</div></section>
+{% endblock %}

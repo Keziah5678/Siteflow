@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="hero"><div class="wrap hero-3">
+  <div class="pitch">
+    <span class="pill">Artisans &amp; TPE du BTP</span>
+    <h1>Ne ratez plus aucun <em>chantier public</em> près de chez vous</h1>
+    <p class="lead">Chaque matin à 7 h, recevez par email les nouveaux appels d'offres publics de votre métier et de vos départements, résumés en 2 lignes.</p>
+  </div>
+  <div class="pts">
+    <ul class="checks">
+      <li>Plomberie, électricité, peinture, maçonnerie… {{ trades|length }} métiers du bâtiment</li>
+      <li>Source officielle : le BOAMP, mis à jour chaque jour</li>
+      <li>Aucun email les jours sans nouveauté</li>
+      <li><strong>{{ site.trial_days }} jours gratuits, sans carte bancaire</strong>, puis {{ site.price_eur_month }} €/mois</li>
+    </ul>
+    {% if stats.notices_30d %}<p class="small">Ces 30 derniers jours : <strong>{{ stats.notices_30d }}</strong> appels d'offres du BTP repérés par ChantierAlerte.</p>{% endif %}
+  </div>
+
+  <div class="card" id="inscription">
+    <form id="subscribe" novalidate>
+      <h2 style="font-size:21px;margin:0">Recevoir mes alertes</h2>
+      <p class="small" style="margin:4px 0 0">Essai gratuit {{ site.trial_days }} jours · sans engagement</p>
+      <label class="l" for="email">Votre email</label>
+      <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="vous@entreprise.fr">
+      <fieldset style="border:0;padding:0;margin:0">
+        <legend class="l" style="padding:0">Votre métier <span class="small">(un ou plusieurs)</span></legend>
+        <div class="chips">
+          {% for t in trades %}<label class="chip"><input type="checkbox" name="trades" value="{{ t.slug }}"><span>{{ t.label }}</span></label>{% endfor %}
+        </div>
+      </fieldset>
+      <label class="l" for="dept-search">Vos départements</label>
+      <input id="dept-search" type="search" placeholder="Rechercher : Gironde, 33…" autocomplete="off">
+      <div class="depts" id="depts" role="group" aria-label="Départements">
+        {% for code, name in depts %}<label data-k="{{ code }} {{ name|lower }}"><input type="checkbox" name="departments" value="{{ code }}"> {{ code }} — {{ name }}</label>{% endfor %}
+      </div>
+      <p class="sel" id="dept-count">Aucun département choisi</p>
+      <div class="hp" aria-hidden="true"><label>Site web <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <button class="btn" type="submit" style="width:100%;margin-top:16px">Démarrer mon essai gratuit</button>
+      <div id="sub-msg" role="status" aria-live="polite"></div>
+      <p class="small" style="margin:10px 0 0">Vos données servent uniquement à vous envoyer les alertes. <a href="confidentialite.html">Confidentialité</a>. Désinscription en un clic.</p>
+    </form>
+  </div>
+</div></div>
+
+<section><div class="wrap">
+  <h2>Comment ça marche</h2>
+  <div class="steps">
+    <div class="card step"><b>1</b><h3 style="margin:0 0 6px">Choisissez</h3><p class="small" style="margin:0">Votre métier et les départements où vous intervenez. 30 secondes.</p></div>
+    <div class="card step"><b>2</b><h3 style="margin:0 0 6px">On surveille</h3><p class="small" style="margin:0">Chaque nuit, ChantierAlerte analyse tous les avis publiés au BOAMP la veille.</p></div>
+    <div class="card step"><b>3</b><h3 style="margin:0 0 6px">Vous répondez</h3><p class="small" style="margin:0">À 7 h, un email clair : objet, acheteur, lieu, date limite et lien vers l'avis.</p></div>
+  </div>
+</div></section>
+
+{% if examples %}
+<section class="alt"><div class="wrap">
+  <h2>Exemples réels de chantiers repérés</h2>
+  <p class="small">Derniers avis détectés par ChantierAlerte (source BOAMP).</p>
+  {% for n in examples %}{% include "_notice.html" %}{% endfor %}
+</div></section>
+{% endif %}
+
+<section><div class="wrap grid hero-g">
+  <div>
+    <h2>Un seul tarif, simple</h2>
+    <p class="price">{{ site.price_eur_month }} €<small> / mois</small></p>
+    <ul class="checks">
+      <li>Alertes illimitées, tous vos métiers et départements</li>
+      <li>{{ site.trial_days }} jours d'essai gratuit sans carte bancaire</li>
+      <li>Résiliable à tout moment, sans engagement</li>
+    </ul>
+    <p><a class="btn" href="#inscription">Essayer gratuitement</a></p>
+  </div>
+  <div>
+    <h2>Questions fréquentes</h2>
+    <details><summary>D'où viennent les appels d'offres ?</summary><p>Du BOAMP (Bulletin officiel des annonces des marchés publics), publié par la DILA. ChantierAlerte en sélectionne les avis qui correspondent à votre métier.</p></details>
+    <details><summary>Que se passe-t-il après l'essai ?</summary><p>Rien d'automatique : vous recevez un rappel 2 jours avant la fin, puis un lien de paiement si vous souhaitez continuer. Sans paiement, les alertes s'arrêtent simplement.</p></details>
+    <details><summary>Et s'il n'y a rien pour moi un jour ?</summary><p>Vous ne recevez aucun email ce jour-là. Pas de spam.</p></details>
+    <details><summary>Puis-je changer de métiers ou de départements ?</summary><p>Oui, à tout moment, grâce au lien « Modifier mes préférences » présent dans chaque email.</p></details>
+    <details><summary>ChantierAlerte répond-il aux appels d'offres à ma place ?</summary><p>Non : nous vous signalons les opportunités. Vous consultez l'avis officiel et y répondez vous-même.</p></details>
+  </div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <h2>Appels d'offres par métier</h2>
+  <ul class="links">{% for t in trades %}<li><a href="appels-offres/{{ t.slug }}/">Appels d'offres {{ t.label|lower }}</a></li>{% endfor %}</ul>
+</div></section>
+{% endblock %}

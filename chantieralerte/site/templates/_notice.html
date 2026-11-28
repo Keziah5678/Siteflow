@@ -1,0 +1,5 @@
+<article class="notice">
+  <h3>{{ n.line1 }}</h3>
+  {% if n.line2 %}<p>{{ n.line2 }}</p>{% endif %}
+  <div class="meta">Date limite : <span class="{{ 'urgent' if n.urgent }}">{{ n.deadline }}</span> · <a href="{{ n.url }}" rel="nofollow noopener" target="_blank">Voir l'avis officiel</a></div>
+</article>

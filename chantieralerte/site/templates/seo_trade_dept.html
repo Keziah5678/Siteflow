@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block head %}<script type="application/ld+json">{{ jsonld | tojson }}</script>{% endblock %}
+{% block main %}
+<section><div class="wrap">
+  <p class="crumbs"><a href="{{ root }}">Accueil</a> › <a href="{{ root }}appels-offres/">Appels d'offres</a> › <a href="{{ root }}appels-offres/{{ trade.slug }}/">{{ trade.label }}</a>{% if dept_name %} › {{ dept_name }}{% endif %}</p>
+  <h1 style="font-size:clamp(24px,6vw,36px);line-height:1.15;margin:0 0 10px">{{ h1 }}</h1>
+  <p class="lead">{{ intro }}</p>
+  <div class="card" style="margin:18px 0;background:#fff7ed;border-color:#fed7aa">
+    <strong>Recevez ces chantiers chaque matin par email.</strong>
+    <p class="small" style="margin:4px 0 10px">{{ site.trial_days }} jours gratuits, sans carte bancaire. Uniquement les avis {{ trade.label|lower }}{% if dept_name %} en {{ dept_name }}{% endif %}.</p>
+    <a class="btn" href="{{ root }}?metier={{ trade.slug }}{% if dept_code %}&amp;dep={{ dept_code }}{% endif %}#inscription">Recevoir les alertes {{ trade.label|lower }}</a>
+  </div>
+  <h2>{{ notices|length }} appel{{ 's' if notices|length > 1 }} d'offres récent{{ 's' if notices|length > 1 }}</h2>
+  {% for n in notices %}{% include "_notice.html" %}{% else %}<p>Aucun avis récent pour le moment. Inscrivez-vous pour être prévenu dès la publication du prochain.</p>{% endfor %}
+  <p class="small">Mis à jour le {{ updated }}. Avis des {{ window_days }} derniers jours dont la date limite n'est pas dépassée. Source : BOAMP.</p>
+  {% if related %}<h2 style="margin-top:28px">{{ related_title }}</h2><ul class="links">{% for r in related %}<li><a href="{{ root }}{{ r.href }}">{{ r.label }}</a></li>{% endfor %}</ul>{% endif %}
+</div></section>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ title }}</title>
+<meta name="description" content="{{ description }}">
+{% if canonical %}<link rel="canonical" href="{{ canonical }}">{% endif %}
+{% if noindex %}<meta name="robots" content="noindex">{% endif %}
+<meta property="og:title" content="{{ title }}"><meta property="og:description" content="{{ description }}"><meta property="og:type" content="website"><meta property="og:locale" content="fr_FR">
+<meta name="theme-color" content="#c2410c">
+<link rel="icon" href="{{ root }}favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="{{ root }}static/style.css?v={{ version }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="{{ root }}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 20V9l7-5 7 5v11" fill="none" stroke="#c2410c" stroke-width="2.4" stroke-linejoin="round"/><circle cx="17.5" cy="6.5" r="3.5" fill="#111827"/></svg>Chantier<b>Alerte</b></a>
+  <a class="btn sm" href="{{ root }}#inscription">Essai gratuit</a>
+</div></header>
+<main>{% block main %}{% endblock %}</main>
+<footer><div class="wrap">
+  <p><strong>ChantierAlerte</strong> — les appels d'offres publics du BTP, chaque matin dans votre boîte mail. Données issues du <a href="https://www.boamp.fr" rel="noopener">BOAMP</a> (DILA, licence ouverte).</p>
+  <p><a href="{{ root }}appels-offres/">Appels d'offres par métier</a> · <a href="{{ root }}mentions-legales.html">Mentions légales</a> · <a href="{{ root }}confidentialite.html">Confidentialité</a> · <a href="{{ root }}cgv.html">CGV</a> · <a href="mailto:{{ site.contact_email }}">Contact</a></p>
+</div></footer>
+<script>window.CA={{ public_config | tojson }};</script>
+<script src="{{ root }}static/app.js?v={{ version }}" defer></script>
+</body>
+</html>

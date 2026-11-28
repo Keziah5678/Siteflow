@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap" style="max-width:720px">
+  <div class="card" id="page" data-page="prefs">
+    <h1 style="font-size:26px;margin:0 0 4px">Mes alertes</h1>
+    <p id="who" class="small">Chargement…</p>
+    <form id="prefs-form" hidden novalidate>
+      <fieldset style="border:0;padding:0;margin:0"><legend class="l" style="padding:0">Métiers</legend>
+        <div class="chips">{% for t in trades %}<label class="chip"><input type="checkbox" name="trades" value="{{ t.slug }}"><span>{{ t.label }}</span></label>{% endfor %}</div>
+      </fieldset>
+      <label class="l" for="dept-search">Départements</label>
+      <input id="dept-search" type="search" placeholder="Rechercher : Gironde, 33…" autocomplete="off">
+      <div class="depts" id="depts">{% for code, name in depts %}<label data-k="{{ code }} {{ name|lower }}"><input type="checkbox" name="departments" value="{{ code }}"> {{ code }} — {{ name }}</label>{% endfor %}</div>
+      <p class="sel" id="dept-count"></p>
+      <button class="btn" type="submit" style="margin-top:14px">Enregistrer</button>
+      <div id="prefs-msg" role="status" aria-live="polite"></div>
+    </form>
+    <div id="account" hidden style="margin-top:24px;border-top:1px solid var(--line);padding-top:16px">
+      <p id="status-line"></p>
+      <p id="pay-zone"></p>
+      <p><button class="btn ghost sm" id="unsub-btn" type="button">Me désinscrire</button>
+         <button class="btn ghost sm" id="resub-btn" type="button" hidden>Réactiver mes alertes</button>
+         <button class="btn ghost sm" id="delete-btn" type="button">Supprimer mes données</button></p>
+      <div id="acct-msg" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</div></section>
+{% endblock %}

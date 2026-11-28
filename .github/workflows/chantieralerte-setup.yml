@@ -1,0 +1,47 @@
+name: ChantierAlerte — installer / mettre à jour la base
+
+# À lancer à la main (onglet Actions) après avoir créé le projet Supabase,
+# puis à chaque modification de la base ou des fonctions.
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: chantieralerte
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Lier le projet
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+      - name: Créer / mettre à jour les tables
+        run: supabase db push --password "$SUPABASE_DB_PASSWORD"
+      - name: Secrets des fonctions (email, adresse du site)
+        run: |
+          supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" \
+            BREVO_API_KEY="${{ secrets.BREVO_API_KEY }}" MAIL_FROM="${{ secrets.MAIL_FROM }}" \
+            MAIL_FROM_NAME=ChantierAlerte MAIL_MODE=brevo SITE_URL="${{ vars.SITE_URL }}"
+      - name: Déployer les fonctions (inscription, désinscription)
+        run: |
+          supabase functions deploy subscribe --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
+          supabase functions deploy unsubscribe --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q

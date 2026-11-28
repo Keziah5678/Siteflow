@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap">
+  <div id="page" data-page="admin">
+    <h1 style="font-size:26px;margin:0 0 8px">Tableau de bord</h1>
+    <form id="login" class="card" style="max-width:460px" hidden>
+      <p class="small">Accès réservé. Entrez votre email administrateur : vous recevrez un lien de connexion.</p>
+      <input type="email" name="email" required placeholder="vous@exemple.fr">
+      <button class="btn" style="margin-top:10px">Recevoir le lien</button>
+      <div id="login-msg" role="status"></div>
+    </form>
+    <div id="dash" hidden>
+      <div class="kpis">
+        <div class="kpi"><span class="small">Abonnés (hors désinscrits)</span><b id="k-total">–</b></div>
+        <div class="kpi"><span class="small">En essai</span><b id="k-trial">–</b></div>
+        <div class="kpi"><span class="small">Payants</span><b id="k-active">–</b></div>
+        <div class="kpi"><span class="small">Revenu mensuel</span><b id="k-mrr">–</b></div>
+        <div class="kpi"><span class="small">En attente de confirmation</span><b id="k-pending">–</b></div>
+        <div class="kpi"><span class="small">Essais terminés</span><b id="k-expired">–</b></div>
+        <div class="kpi"><span class="small">Désinscrits</span><b id="k-unsub">–</b></div>
+        <div class="kpi"><span class="small">Nouveaux (7 j)</span><b id="k-new">–</b></div>
+      </div>
+      <h2 style="margin-top:26px;font-size:20px">Dernières exécutions du robot</h2>
+      <table class="stats" id="runs"><thead><tr><th>Date</th><th>Statut</th><th>Avis</th><th>Emails</th></tr></thead><tbody></tbody></table>
+      <h2 style="margin-top:26px;font-size:20px">Métiers des abonnés</h2>
+      <table class="stats" id="trades"><tbody></tbody></table>
+      <p><button class="btn ghost sm" id="logout" type="button">Se déconnecter</button></p>
+    </div>
+  </div>
+</div></section>
+{% endblock %}

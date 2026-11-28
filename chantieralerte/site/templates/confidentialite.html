@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block main %}
+<section><div class="wrap legal">
+  <h1>Politique de confidentialité</h1>
+  <p class="small">Document à faire valider par un professionnel avant mise en ligne. Dernière mise à jour : {{ updated }}.</p>
+  <h2>Responsable du traitement</h2>
+  <p>{{ e.nom_ou_raison_sociale|todo }}, {{ e.adresse|todo }} — {{ site.contact_email|todo }}.</p>
+  <h2>Données collectées</h2>
+  <ul><li>Votre adresse email ;</li><li>vos métiers et départements choisis ;</li><li>le statut de votre abonnement (essai, payant…) et ses dates ;</li><li>la liste des avis qui vous ont été envoyés (pour ne jamais vous les renvoyer) ;</li><li>pour les abonnés payants : l'identifiant client Stripe. Vos coordonnées bancaires sont traitées uniquement par Stripe et ne nous sont jamais transmises.</li></ul>
+  <p>Aucun cookie publicitaire ni outil de mesure d'audience n'est utilisé. L'adresse IP est utilisée de façon temporaire (24 h maximum) pour limiter les abus du formulaire.</p>
+  <h2>Finalités et bases légales</h2>
+  <ul><li>Envoi des alertes et gestion de l'essai : exécution du contrat (art. 6.1.b RGPD), après confirmation de votre adresse (double opt-in) ;</li><li>facturation : obligation légale et exécution du contrat ;</li><li>prévention des abus : intérêt légitime.</li></ul>
+  <h2>Destinataires (sous-traitants)</h2>
+  <p>Supabase (hébergement de la base), Brevo (envoi des emails), Stripe (paiement), GitHub (hébergement du site et exécution du robot). Ces prestataires agissent sur instruction de l'éditeur. Vos données ne sont jamais vendues ni louées.</p>
+  <h2>Durées de conservation</h2>
+  <ul><li>Compte non confirmé : supprimé après 30 jours ;</li><li>abonné : pendant l'abonnement puis 3 ans après le dernier contact ;</li><li>données de facturation : 10 ans (obligation comptable).</li></ul>
+  <h2>Vos droits</h2>
+  <p>Vous disposez des droits d'accès, de rectification, d'effacement, d'opposition, de limitation et de portabilité. Depuis le lien « Modifier mes préférences » présent dans chaque email, vous pouvez modifier vos choix, vous désinscrire en un clic et <strong>supprimer définitivement vos données</strong>. Pour toute autre demande : {{ site.contact_email|todo }}. Vous pouvez introduire une réclamation auprès de la CNIL (www.cnil.fr).</p>
+</div></section>
+{% endblock %}

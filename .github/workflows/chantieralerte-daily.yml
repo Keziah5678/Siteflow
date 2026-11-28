@@ -1,0 +1,79 @@
+name: ChantierAlerte — robot quotidien
+
+# 6 h à Paris toute l'année : 04:00 UTC (heure d'été) et 05:00 UTC (heure d'hiver).
+# Le robot ne travaille qu'une fois par jour, après 6 h heure de Paris.
+on:
+  schedule:
+    - cron: "0 4 * * *"
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Forcer l'exécution (ignorer l'heure et le « déjà fait aujourd'hui »)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: chantieralerte-daily
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: chantieralerte
+
+jobs:
+  robot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      ran: ${{ steps.robot.outputs.ran }}
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+      MAIL_FROM: ${{ secrets.MAIL_FROM }}
+      MAIL_FROM_NAME: ChantierAlerte
+      MAIL_MODE: brevo
+      MAIL_DAILY_LIMIT: "290"
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      SITE_URL: ${{ vars.SITE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: chantieralerte/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Vérifier la configuration
+        run: |
+          for v in SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY SUPABASE_ANON_KEY BREVO_API_KEY MAIL_FROM; do
+            if [ -z "${!v}" ]; then echo "::error::Secret manquant : $v (voir README, étape 6)"; exit 1; fi
+          done
+      - name: Robot (BOAMP → paiements → essais → emails)
+        id: robot
+        run: python -m robot.run ${{ inputs.force && '--force' || '' }}
+      - name: Générer le site
+        if: steps.robot.outputs.ran == 'true'
+        run: python -m robot.build_site
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.robot.outputs.ran == 'true'
+        with:
+          path: chantieralerte/dist
+
+  deploy:
+    needs: robot
+    if: needs.robot.outputs.ran == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
